@@ -1,0 +1,50 @@
+7
+
+MASTER:
+sudo apt update
+sudo apt install -y ansible
+ansible --version
+
+ansible localhost -m ping
+
+ssh-keygen
+cd .ssh
+ls
+cat id_ed25519.pub - (ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIegHqe55+EhhQKX5aGg4Y33ELsjwlgWqvUaex7Fzhk ubuntu@ip-172-31-24-6) - copy paste this key in echo" " line
+
+NODE:
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIegHqe55+EhhQKX5aGg4Y33ELsjwlgWqvUaex7Fzhk ubuntu@ip-172-31-24-6" >> ~/.ssh/authorized_keys
+
+MASTER:
+cd ..
+
+nano ~/inventory.ini:
+	[node_machines]
+	NODE_MACHINE_IP ansible_ssh_user=ubuntu
+
+nano ~/install_package.yml:
+---
+- name: Install a package on the node machine
+  hosts: node_machines
+  become: yes
+
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+ssh ubuntu@publicnodeip
+type yes
+type exit
+
+ansible-playbook -i ~/inventory.ini ~/install_package.yml
+systemctl status nginx
+
+change the security grp of NODE MACHINE to 80 anywhere on IP4 and "http://node-ip" on browser
