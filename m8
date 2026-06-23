@@ -1,0 +1,81 @@
+8
+
+MASTER AND NODE:
+sudo apt update
+sudo apt install openjdk-21-jdk -y
+java -version
+
+MASTER:
+wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+sudo tar -xzf apache-maven-3.9.6-bin.tar.gz -C /opt/
+echo 'export PATH=/opt/apache-maven-3.9.6/bin:$PATH' | sudo tee /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+mvn -version
+
+sudo apt install -y ansible
+ansible --version
+
+https://pkg.jenkins.io/debian-stable/ - 3 codes
+
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status Jenkins
+
+change the security grp of MASTER to 8080 anywhere on IP4
+http://your-server-ip(master public-ip):8080
+
+ssh-keygen
+cat ~/.ssh/id_ed25519.pub
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+NODE:
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH4uxiAO+EQmpEdjCpp5oxg/YPpVpQKRQfE/bzEgTQSA ubuntu@ip-172-31-24-160" >> ~/.ssh/authorized_keys
+
+MASTER:
+ssh ubuntu@public_nodeip - to check connection
+
+MASTER:
+sudo mkdir -p /var/lib/jenkins/.ssh
+sudo cp /home/ubuntu/.ssh/id_ed25519 /var/lib/jenkins/.ssh/
+sudo cp /home/ubuntu/.ssh/id_ed25519.pub /var/lib/jenkins/.ssh/
+sudo chown -R jenkins:jenkins /var/lib/jenkins/.ssh
+sudo chmod 700 /var/lib/jenkins/.ssh
+
+nano ~/inventory.ini
+[webserver]
+Node public ip ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/.ssh/id_ed25519 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+nano ~/deploy.yml
+- name: Deploy Maven JAR to Target Server
+  hosts: webserver
+  tasks:
+    - name: Copy JAR file to Remote Server
+      copy:
+        src: /var/lib/jenkins/.m2/repository/com/mycompany/app/my-app/1.0-SNAPSHOT/my-app-1.0-SNAPSHOT.jar
+        dest: /home/ubuntu/app.jar
+        mode: '0755'
+
+    - name: Run Java Application
+      shell: nohup java -jar /home/ubuntu/app.jar > app.log 2>&1 &
+
+sudo mv ~/deploy.yml ~/inventory.ini /var/lib/jenkins/
+sudo chown jenkins:jenkins /var/lib/jenkins/deploy.yml /var/lib/jenkins/inventory.ini
+
+sudo systemctl stop jenkins
+sudo systemctl start jenkins
+
+install nd add maven nd ansible in tools - jenkins
+Ansible, /usr/bin/
+maven 3.9.6,/opt/apache-maven-3.9.6
+
+freestyle proj
+give git hub url: https://github.com/mvsanthi123/simple-java-maven-app.git
+
+bildsteps-- pls select  invoketoplevel maven taget-give name as maven and goal as clean install package
+
+excecute shell: ansible-playbook -i ~/inventory.ini ~/deploy.yml
+
+BUILD NOW - check storage
+
+NODE:
+java -jar app.jar
