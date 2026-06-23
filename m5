@@ -1,0 +1,14 @@
+5
+
+sudo apt update
+sudo apt install -y default-jre default-jdk
+java -version
+
+https://pkg.jenkins.io/ - 1st 3 codes
+
+sudo service jenkins start
+sudo service jenkins status
+
+-"add security grp :- :8080 anywhere on IP4, http://your-server-ip(public-ip):8080"-
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
