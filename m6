@@ -1,0 +1,29 @@
+6
+
+sudo apt update
+sudo apt install openjdk-21-jdk -y
+java -version
+
+wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+sudo tar -xzf apache-maven-3.9.6-bin.tar.gz -C /opt/
+echo 'export PATH=/opt/apache-maven-3.9.6/bin:$PATH' | sudo tee /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+mvn -version
+
+https://pkg.jenkins.io/ - 1st 3 codes
+
+sudo service jenkins start
+sudo service jenkins status
+
+-"add security grp :- :8080 anywhere on IP4, http://your-server-ip(public-ip):8080"-
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+Jenkins -> Plugins -> Maven -> tools -> add maven 
+	Maven - maven 3.9.6, /opt/apache-maven-3.9.6
+	git -> build steps -> maven 3.9.6 -> clean install
+
+sudo su - Jenkins
+cd /var/lib/jenkins/.m2/repository/com/mycompany/app/my-app/1.0-SNAPSHOT/
+ls
+java -jar my-app-1.0-SNAPSHOT.jar
